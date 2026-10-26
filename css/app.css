@@ -1,0 +1,4 @@
+#kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media(max-width:1200px){#kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:480px){#kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#dagw{height:520px!important}}

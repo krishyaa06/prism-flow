@@ -1,0 +1,33 @@
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm" id="start">+ New run</button>
+        <button class="btn sm bad" id="crash">Crash a busy worker</button>
+        <span class="sep"></span>
+        <label class="f inl">Workers <input type="range" id="workers" min="1" max="8" value="3" /><output id="wo">3</output></label>
+        <label class="f inl">Chaos <input type="range" id="chaos" min="0" max="50" value="12" /><output id="co">12%</output></label>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="dagw" style="height:330px"><span class="tag">Workflow DAG · <b id="runid">run-1</b> · nightly-ml-pipeline</span><canvas id="dag"></canvas></div>
+    <div class="viz" id="ganttw" style="height:150px"><span class="tag">Worker timeline · last 20s</span><canvas id="gantt"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Tasks / second</div><canvas class="chart" id="ch1" style="height:140px"></canvas></div>
+      <div class="panel"><div class="ph">Queue depth · busy workers</div><canvas class="chart" id="ch2" style="height:140px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Event history<span class="sp"></span><span class="pill dim" id="evn">0 events</span></div><div id="log" class="log" style="height:330px"></div></div>
+    <div class="panel"><div class="ph">Replay check<span class="sp"></span><button class="btn sm" id="replay">Replay history</button></div><div id="rep" class="log" style="height:120px"><div class="dim">Rebuilds every run's state from the event log alone and diffs it against live state.</div></div></div>
+    <div class="panel"><div class="ph">Cron schedule</div>
+      <label class="f">Expression <input id="cron" value="*/15 9-17 * * mon-fri" spellcheck="false" /></label>
+      <div id="cronout" class="log" style="height:132px;margin-top:8px"></div>
+    </div>
+  </div>
+</div>

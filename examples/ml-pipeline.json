@@ -1,0 +1,17 @@
+{
+  "name": "nightly-ml-pipeline",
+  "schedule": "0 2 * * *",
+  "tasks": [
+    { "id": "extract_orders", "duration": 1.2, "retries": 3 },
+    { "id": "extract_users", "duration": 0.9, "retries": 3 },
+    { "id": "extract_events", "duration": 1.6, "retries": 3, "failRate": 0.25 },
+    { "id": "validate", "deps": ["extract_orders", "extract_users", "extract_events"], "duration": 0.6 },
+    { "id": "features", "deps": ["validate"], "duration": 2.0, "priority": 2 },
+    { "id": "train_xgb", "deps": ["features"], "duration": 2.6, "timeout": 5, "failRate": 0.15 },
+    { "id": "train_mlp", "deps": ["features"], "duration": 2.2, "timeout": 5 },
+    { "id": "evaluate", "deps": ["train_xgb", "train_mlp"], "duration": 0.8 },
+    { "id": "report", "deps": ["validate"], "duration": 0.7 },
+    { "id": "publish_model", "deps": ["evaluate"], "duration": 0.5, "retries": 5 },
+    { "id": "notify", "deps": ["publish_model", "report"], "duration": 0.3 }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "name": "prism-flow",
+  "version": "1.0.0",
+  "description": "Prism Flow is a distributed job scheduler and workflow engine: DAG validation and critical path, a priority worker pool, retries with exponential backoff and jitter, timeouts, heartbeat-based recovery from worker crashes, a cron parser and an event-sourced history that replays to the same state.",
+  "type": "module",
+  "bin": {
+    "flow": "bin/flow.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "npx --yes serve ."
+  },
+  "keywords": [
+    "workflow-engine",
+    "job-scheduler",
+    "dag",
+    "temporal",
+    "airflow",
+    "event-sourcing",
+    "retry",
+    "cron",
+    "distributed-systems",
+    "javascript"
+  ],
+  "author": "Soumya Bhandare (krishyaa06)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krishyaa06/prism-flow.git"
+  },
+  "homepage": "https://krishyaa06.github.io/prism-flow/",
+  "engines": {
+    "node": ">=18.17"
+  }
+}

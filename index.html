@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism Flow · DAG workflow engine with retries, timeouts, crash recovery and event replay · Prism Systems</title>
+  <meta name="description" content="Prism Flow is a distributed job scheduler and workflow engine: DAG validation and critical path, a priority worker pool, retries with exponential backoff and jitter, timeouts, heartbeat-based recovery from worker crashes, a cron parser and an event-sourced history that replays to the same state." />
+  <meta name="theme-color" content="#06070d" />
+  <meta property="og:title" content="Prism Flow · Prism Systems" />
+  <meta property="og:description" content="Prism Flow is a distributed job scheduler and workflow engine: DAG validation and critical path, a priority worker pool, retries with exponential backoff and jitter, timeouts, heartbeat-based recovery from worker crashes, a cron parser and an event-sourced history that replays to the same state." />
+  <meta property="og:image" content="https://krishyaa06.github.io/prism-flow/assets/screenshots/desktop.png" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/pro.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <style>:root{--accent:#00D2FF;--accent-2:#22E3A1}</style>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header class="topbar"><div class="wrap">
+    <a class="brand" href="./"><span class="mark">◆</span><b>PRISM</b><span>Flow</span></a>
+    <nav>
+      <a class="nl" href="#sim">Simulator</a><a class="nl" href="#features">Features</a><a class="nl" href="#how">How it works</a><a class="nl" href="#arch">Architecture</a><a class="nl" href="#use">Use it</a>
+      <a class="btn sm" href="https://github.com/krishyaa06/prism-flow" target="_blank" rel="noreferrer">★ GitHub</a>
+    </nav>
+  </div></header>
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow"><span class="n">02 / 49</span>Prism Systems · Cloud-Native &amp; Developer Infrastructure</p>
+      <h1>Durable <em>workflows</em> that survive crashes, retries and replays</h1>
+      <p class="lead">A Temporal / Airflow-style workflow engine: DAG scheduling, a shared worker pool, exponential backoff with jitter, timeouts, heartbeat recovery from worker crashes, cron schedules and an event history you can replay.</p>
+      <div class="cta"><a class="btn primary" href="#sim">▶ Launch the simulator</a><a class="btn" href="#use">Use the engine</a><a class="btn ghost" href="https://github.com/krishyaa06/prism-flow" target="_blank" rel="noreferrer">View source →</a></div>
+      <div class="chips"><span class="chip"><i></i>Zero dependencies</span><span class="chip"><i></i>Deterministic virtual clock</span><span class="chip"><i></i>Event sourced</span><span class="chip"><i></i>Cron parser</span><span class="chip"><i></i>Async executor</span></div>
+    </section>
+    <section class="section wrap" id="sim">
+      <div class="sec-head"><span class="kicker">Live simulator</span><h2>Watch a pipeline heal itself</h2><p>An 11-task ML pipeline runs on a shared worker pool. Raise the chaos slider to inject failures, crash a busy worker, add workers, start concurrent runs, then replay the event history to prove the state rebuilds exactly.</p></div>
+<div class="sim">
+  <div class="main">
+    <div class="panel glow">
+      <div class="toolbar">
+        <button class="btn primary sm" data-play>▶ Run</button>
+        <select data-speed aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+        <span class="sep"></span>
+        <button class="btn sm" id="start">+ New run</button>
+        <button class="btn sm bad" id="crash">Crash a busy worker</button>
+        <span class="sep"></span>
+        <label class="f inl">Workers <input type="range" id="workers" min="1" max="8" value="3" /><output id="wo">3</output></label>
+        <label class="f inl">Chaos <input type="range" id="chaos" min="0" max="50" value="12" /><output id="co">12%</output></label>
+        <span class="sp"></span>
+        <span class="live"><i></i> paused</span>
+      </div>
+      <div id="kpis" style="margin-top:12px"></div>
+    </div>
+    <div class="viz" id="dagw" style="height:330px"><span class="tag">Workflow DAG · <b id="runid">run-1</b> · nightly-ml-pipeline</span><canvas id="dag"></canvas></div>
+    <div class="viz" id="ganttw" style="height:150px"><span class="tag">Worker timeline · last 20s</span><canvas id="gantt"></canvas></div>
+    <div class="g2 grid">
+      <div class="panel"><div class="ph">Tasks / second</div><canvas class="chart" id="ch1" style="height:140px"></canvas></div>
+      <div class="panel"><div class="ph">Queue depth · busy workers</div><canvas class="chart" id="ch2" style="height:140px"></canvas></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="panel"><div class="ph">Event history<span class="sp"></span><span class="pill dim" id="evn">0 events</span></div><div id="log" class="log" style="height:330px"></div></div>
+    <div class="panel"><div class="ph">Replay check<span class="sp"></span><button class="btn sm" id="replay">Replay history</button></div><div id="rep" class="log" style="height:120px"><div class="dim">Rebuilds every run's state from the event log alone and diffs it against live state.</div></div></div>
+    <div class="panel"><div class="ph">Cron schedule</div>
+      <label class="f">Expression <input id="cron" value="*/15 9-17 * * mon-fri" spellcheck="false" /></label>
+      <div id="cronout" class="log" style="height:132px;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+    </section>
+    <section class="section wrap" id="features">
+      <div class="sec-head reveal"><span class="kicker">Features</span><h2>What's inside the engine</h2><p>Real algorithms, not mock-ups. The simulator above runs the exact same code you import.</p></div>
+      <div class="feat"><div class="card reveal"><div class="ic">⇶</div><h3>DAG engine</h3><p>Kahn topological sort, cycle and unknown-dependency detection, depth levels and <b>critical path</b> analysis.</p></div><div class="card reveal"><div class="ic">▤</div><h3>Shared worker pool</h3><p>Tasks from many runs compete for N workers by priority, then FIFO. Concurrency is never exceeded.</p></div><div class="card reveal"><div class="ic">↻</div><h3>Retries with jitter</h3><p>Exponential backoff with full, equal or no jitter, a cap and per-task <code class="mono">retries</code>, the way AWS recommends.</p></div><div class="card reveal"><div class="ic">⏱</div><h3>Timeouts</h3><p>A task that overruns <code class="mono">timeout</code> is failed and retried like any other error.</p></div><div class="card reveal"><div class="ic">♥</div><h3>Crash recovery</h3><p>When a worker dies mid-task, the heartbeat timeout fails the attempt and the task is re-queued on a healthy worker.</p></div><div class="card reveal"><div class="ic">⟲</div><h3>Event-sourced history</h3><p>Every transition is an append-only event. <code class="mono">replay(history)</code> rebuilds identical state, and the same seed yields the same history.</p></div><div class="card reveal"><div class="ic">⏰</div><h3>Cron schedules</h3><p>Five-field cron with ranges, steps, names, <code class="mono">@daily</code>-style macros and Vixie day-of-month/day-of-week semantics.</p></div><div class="card reveal"><div class="ic">⚙</div><h3>Real async executor</h3><p><code class="mono">execute(dag, handlers)</code> runs real async functions with the same retry, timeout and concurrency semantics.</p></div></div>
+    </section>
+    <section class="section wrap" id="how">
+      <div class="sec-head reveal"><span class="kicker">How it works</span><h2>From request to result</h2></div>
+      <div class="steps"><div class="step reveal"><h3>Define</h3><p>A workflow is JSON: tasks with <code class="mono">deps</code>, <code class="mono">retries</code>, <code class="mono">timeout</code>, <code class="mono">priority</code> and optional <code class="mono">backoff</code>. It is validated as a DAG before it starts.</p></div><div class="step reveal"><h3>Schedule</h3><p>Root tasks are queued. Whenever a task completes, children whose dependencies are all done get queued.</p></div><div class="step reveal"><h3>Dispatch</h3><p>Idle workers take the highest-priority queued task across all runs. The engine runs on a virtual clock driven by a timer heap.</p></div><div class="step reveal"><h3>Recover</h3><p>Failures and timeouts schedule a retry timer using backoff + jitter. Lost workers trigger a heartbeat timeout. Permanent failure skips everything downstream.</p></div><div class="step reveal"><h3>Replay</h3><p>The history is the source of truth. Replaying it rebuilds every run and task state, which is how durable engines resume after a restart.</p></div></div>
+    </section>
+    <section class="section wrap" id="arch">
+      <div class="sec-head reveal"><span class="kicker">Architecture</span><h2>System design</h2><p>Every box is a module in src/. Data flows left to right.</p></div>
+      <div class="card arch reveal"><svg viewBox="0 0 1160 310" role="img" aria-label="Architecture diagram"><path class="e" d="M272,113 C290,113 290,73 308,73"/><path class="f" d="M272,113 C290,113 290,73 308,73"/><text class="el" x="290" y="87" text-anchor="middle">start</text><path class="e" d="M272,193 C290,193 290,73 308,73"/><path class="f" d="M272,193 C290,193 290,73 308,73"/><path class="e" d="M548,102 C578,102 578,124 548,124"/><path class="f" d="M548,102 C578,102 578,124 548,124"/><path class="e" d="M562,153 C580,153 580,113 598,113"/><path class="f" d="M562,153 C580,153 580,113 598,113"/><text class="el" x="580" y="127" text-anchor="middle">dispatch</text><path class="e" d="M598,113 C580,113 580,233 562,233"/><path class="f" d="M598,113 C580,113 580,233 562,233"/><text class="el" x="580" y="167" text-anchor="middle">done / fail</text><path class="e" d="M548,204 C578,204 578,182 548,182"/><path class="f" d="M548,204 C578,204 578,182 548,182"/><text class="el" x="578" y="193" text-anchor="middle">retry</text><path class="e" d="M598,193 C580,193 580,233 562,233"/><path class="f" d="M598,193 C580,193 580,233 562,233"/><text class="el" x="580" y="207" text-anchor="middle">timeout</text><path class="e" d="M852,113 C870,113 870,113 888,113"/><path class="f" d="M852,113 C870,113 870,113 888,113"/><text class="el" x="870" y="107" text-anchor="middle">events</text><path class="e" d="M1128,142 C1158,142 1158,164 1128,164"/><path class="f" d="M1128,142 C1158,142 1158,164 1128,164"/><text class="lane" x="145" y="24" text-anchor="middle">CLIENTS</text><g class="node k0"><rect x="18" y="84" width="254" height="58" rx="12"/><text x="145" y="109" text-anchor="middle">Workflow JSON</text><text class="s" x="145" y="123" text-anchor="middle">DAG + policies</text></g><g class="node k0"><rect x="18" y="164" width="254" height="58" rx="12"/><text x="145" y="189" text-anchor="middle">Cron trigger</text><text class="s" x="145" y="203" text-anchor="middle">next fire time</text></g><text class="lane" x="435" y="24" text-anchor="middle">ENGINE</text><g class="node kk2"><rect x="308" y="44" width="254" height="58" rx="12"/><text x="435" y="69" text-anchor="middle">Validator</text><text class="s" x="435" y="83" text-anchor="middle">topo · cycles</text></g><g class="node kk2"><rect x="308" y="124" width="254" height="58" rx="12"/><text x="435" y="149" text-anchor="middle">Scheduler</text><text class="s" x="435" y="163" text-anchor="middle">ready queue</text></g><g class="node kk2"><rect x="308" y="204" width="254" height="58" rx="12"/><text x="435" y="229" text-anchor="middle">Timer heap</text><text class="s" x="435" y="243" text-anchor="middle">virtual clock</text></g><text class="lane" x="725" y="24" text-anchor="middle">WORKERS</text><g class="node kk3"><rect x="598" y="84" width="254" height="58" rx="12"/><text x="725" y="109" text-anchor="middle">Worker pool</text><text class="s" x="725" y="123" text-anchor="middle">priority dispatch</text></g><g class="node kk3"><rect x="598" y="164" width="254" height="58" rx="12"/><text x="725" y="189" text-anchor="middle">Heartbeats</text><text class="s" x="725" y="203" text-anchor="middle">crash detect</text></g><text class="lane" x="1015" y="24" text-anchor="middle">DURABILITY</text><g class="node k0"><rect x="888" y="84" width="254" height="58" rx="12"/><text x="1015" y="109" text-anchor="middle">Event history</text><text class="s" x="1015" y="123" text-anchor="middle">append-only</text></g><g class="node k0"><rect x="888" y="164" width="254" height="58" rx="12"/><text x="1015" y="189" text-anchor="middle">Replay</text><text class="s" x="1015" y="203" text-anchor="middle">rebuild state</text></g></svg></div>
+    </section>
+    <section class="section wrap" id="use">
+      <div class="sec-head reveal"><span class="kicker">Use it</span><h2>Ship it in your own stack</h2><p>Zero dependencies. Works in Node.js 18+ and modern browsers.</p></div>
+      <div class="tabs" data-tabs="use"><button class="on">JavaScript API</button><button>CLI</button><button>Install</button></div>
+      <div class="tabp on" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>example.js</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-k">import</span> { Engine, replay, execute } <span class="tk-k">from</span> <span class="tk-s">&quot;prism-flow&quot;</span>;
+
+<span class="tk-k">const</span> wf = { name: <span class="tk-s">&quot;etl&quot;</span>, tasks: [
+  { id: <span class="tk-s">&quot;extract&quot;</span>, duration: <span class="tk-n">1</span>, retries: <span class="tk-n">3</span> },
+  { id: <span class="tk-s">&quot;transform&quot;</span>, deps: [<span class="tk-s">&quot;extract&quot;</span>], timeout: <span class="tk-n">5</span> },
+  { id: <span class="tk-s">&quot;load&quot;</span>, deps: [<span class="tk-s">&quot;transform&quot;</span>], backoff: { base: <span class="tk-n">0.5</span>, cap: <span class="tk-n">10</span>, jitter: <span class="tk-s">&quot;full&quot;</span> } },
+]};
+
+<span class="tk-c">// 1) deterministic simulation on a virtual clock</span>
+<span class="tk-k">const</span> e = <span class="tk-k">new</span> <span class="tk-f">Engine</span>({ workers: <span class="tk-n">3</span>, seed: <span class="tk-n">1</span>, failRate: <span class="tk-n">0.1</span> });
+e.<span class="tk-f">on</span>((ev) =&gt; console.<span class="tk-f">log</span>(ev.t, ev.type, ev.task ?? <span class="tk-s">&quot;&quot;</span>));
+e.<span class="tk-f">start</span>(wf); e.<span class="tk-f">drain</span>();
+console.<span class="tk-f">log</span>(<span class="tk-f">replay</span>(e.history).<span class="tk-f">get</span>(<span class="tk-s">&quot;run-1&quot;</span>).status); <span class="tk-c">// &quot;completed&quot;</span>
+
+<span class="tk-c">// 2) run real async handlers with the same semantics</span>
+<span class="tk-k">const</span> out = <span class="tk-k">await</span> <span class="tk-f">execute</span>(wf, {
+  extract: <span class="tk-k">async</span> () =&gt; <span class="tk-f">fetch</span>(<span class="tk-s">&quot;https://api.example.com/rows&quot;</span>).<span class="tk-f">then</span>((r) =&gt; r.<span class="tk-f">json</span>()),
+  transform: <span class="tk-k">async</span> ({ results }) =&gt; results.extract.<span class="tk-f">map</span>(clean),
+  load: <span class="tk-k">async</span> ({ results }) =&gt; db.<span class="tk-f">insert</span>(results.transform),
+}, { concurrency: <span class="tk-n">4</span> });</code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-pr">$ </span>npx github:krishyaa06/prism-flow validate examples/ml-pipeline.json
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-flow run examples/ml-pipeline.json <span class="tk-p">--workers</span> 3 <span class="tk-p">--fail</span> 0.2 <span class="tk-p">--history</span> h.json
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-flow replay h.json
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-flow cron <span class="tk-s">&quot;*/15 9-17 * * mon-fri&quot;</span> <span class="tk-p">--n</span> 5</code></pre></div></div>
+      <div class="tabp" data-tabp="use"><div class="codebox"><div class="bar2"><i></i><i></i><i></i><span>terminal</span><button class="btn sm ghost copy" data-copy>Copy</button></div><pre><code><span class="tk-c"># use the CLI without installing</span>
+<span class="tk-pr">$ </span>npx github:krishyaa06/prism-flow <span class="tk-p">--help</span>
+
+<span class="tk-c"># or add the engine to your project</span>
+<span class="tk-pr">$ </span>npm install github:krishyaa06/prism-flow
+
+<span class="tk-c"># run the simulator locally</span>
+<span class="tk-pr">$ </span>git clone https://github.com/krishyaa06/prism-flow.git &amp;&amp; cd prism-flow
+<span class="tk-pr">$ </span>npx serve .   # then open http://localhost:3000</code></pre></div></div>
+    </section>
+  </main>
+  <footer class="foot"><div class="wrap">
+    <span>◆ Prism Flow · Prism Systems 02/49 · Built by <a href="https://github.com/krishyaa06">Soumya Bhandare</a> &amp; <a href="https://dc.gg/prismprotocol" target="_blank" rel="noreferrer">Prism Protocol</a></span>
+    <span><a href="https://github.com/krishyaa06/prism-flow" target="_blank" rel="noreferrer">Source</a> · <a href="https://github.com/krishyaa06/prism-flow/blob/main/docs/ARCHITECTURE.md">Architecture</a> · <a href="https://github.com/krishyaa06/prism-flow/blob/main/docs/USAGE.md">Docs</a> · MIT License</span>
+  </div></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

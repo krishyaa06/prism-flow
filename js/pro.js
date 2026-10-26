@@ -30,7 +30,7 @@ export class Loop {
   start() { if (this.running) return; this.running = true; this.last = performance.now(); requestAnimationFrame(this._f); this.onchange?.(true); }
   stop() { this.running = false; this.onchange?.(false); }
   toggle() { this.running ? this.stop() : this.start(); }
-  _f(now) { if (!this.running) return; const dt = Math.min(0.1, (now - this.last) / 1000) * this.speed; this.last = now; this.t += dt; this.tick(dt, this.t); requestAnimationFrame(this._f); }
+  _f(now) { if (!this.running) return; const dt = Math.max(0, Math.min(0.1, (now - this.last) / 1000)) * this.speed; this.last = now; this.t += dt; this.tick(dt, this.t); requestAnimationFrame(this._f); }
 }
 /** Wire [data-play] button, [data-speed] select and .live indicator to a Loop. */
 export function bindLoop(loop, root = document) {
